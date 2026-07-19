@@ -1,0 +1,13 @@
+{
+  "name": "my-node-app",
+  "version": "1.0.0",
+  "description": "Simple Node.js app for CI/CD demo",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node -e \"console.log('No tests defined')\"",
+    "build": "node -e \"console.log('Build successful')\""
+  },
+  "author": "OpenAI",
+  "license": "MIT"
+}
