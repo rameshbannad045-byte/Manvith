@@ -6,9 +6,6 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
-  
-permissions:
   contents: read # or 'write' if your action pushes tags/commits
   packages: read
   
