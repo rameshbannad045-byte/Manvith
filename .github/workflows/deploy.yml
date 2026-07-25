@@ -5,12 +5,16 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: write
+  
+permissions:
+  contents: read # or 'write' if your action pushes tags/commits
+  packages: read
+  
 env:
   GHCR_REPO: ghcr.io/${{ github.repository_owner }}/sample-node-app
   CONTAINER_NAME: sample-node-app
-
-permissions:
-  contents: write
 
 jobs:
   test:
