@@ -6,9 +6,9 @@ on:
   pull_request:
     branches: [ main ]
 
-defaults:
-  run:
-    working-directory: ./sample-node-app
+- name: Install Dependencies
+  working-directory: ./sample-node-app
+  run: npm ci
 
 env:
   DOCKERHUB_REPO: ${{ secrets.DOCKERHUB_USERNAME }}/node-app
