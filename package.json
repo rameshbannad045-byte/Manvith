@@ -5,8 +5,11 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test": "node -e \"console.log('No tests defined')\"",
+    "test": "jest --runInBand",
     "build": "node -e \"console.log('Build successful')\""
+  },
+  "devDependencies": {
+    "jest": "^29.0.0"
   },
   "author": "OpenAI",
   "license": "MIT"
