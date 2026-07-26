@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: CI/CD Pipeline, Biuld, Test, and Deploy Node.js Application to Docker on EC2
 
 on:
   push:
