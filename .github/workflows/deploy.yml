@@ -8,7 +8,6 @@ on:
 env:
   IMAGE_NAME: sample-node-app
 
- 
  jobs:
   test:
     name: Build and Test
@@ -23,7 +22,7 @@ env:
         with:
             node-version: 20
       - name: Install Dependencies
-        run: npm ci
+        run: npm install
 
       - name: Run Tests
         run: npm test
