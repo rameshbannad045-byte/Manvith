@@ -1,0 +1,8 @@
+version: '3.8'
+services:
+  app:
+    image: rameshbannad045/sample-node-app:latest
+    container_name: node-app
+    restart: always
+    ports:
+      - "80:3000"
