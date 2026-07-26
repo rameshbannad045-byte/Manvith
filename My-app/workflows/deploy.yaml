@@ -3,8 +3,8 @@ on:
 push:
 branches: [ main ]
 env:
-DOCKERHUB_REPO: rameshbannad045/sample-node-app
-CONTAINER_NAME: sample-node-app
+DOCKERHUB_REPO: rameshbannad045/sample-node-app1
+CONTAINER_NAME: sample-node-app1
 jobs:
 # ---------- 1. TEST STAGE ----------
 test:
