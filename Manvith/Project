@@ -1,0 +1,107 @@
+# CI/CD: build Node app, test, build & push Docker image to DockerHub, deploy to EC2
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  APP_NAME: my-node-app
+  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.APP_NAME }}
+
+jobs:
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies (cache)
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: |
+          set -o pipefail
+          npm test
+
+  build-and-publish:
+    name: Build and push Docker image
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU (for multi-arch if needed)
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.IMAGE_NAME }}:latest
+
+      - name: Set output image
+        id: image
+        run: echo "::set-output name=tag::${{ env.IMAGE_NAME }}:${{ github.sha }}"
+
+  deploy:
+    name: Deploy to EC2 via SSH
+    runs-on: ubuntu-latest
+    needs: build-and-publish
+    steps:
+      - name: Wait for image tag
+        run: echo "Deploying image ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.APP_NAME }}:${{ github.sha }}"
+
+      - name: Deploy to EC2 (SSH)
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: ${{ secrets.EC2_SSH_PORT || 22 }}
+          script: |
+            set -euo pipefail
+            IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/${{ env.APP_NAME }}:${{ github.sha }}
+            echo "Pulling $IMAGE on remote host"
+            # Login on remote host if DockerHub private (use secrets)
+            if [ -n "${{ secrets.DOCKERHUB_TOKEN }}" ]; then
+              echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+            fi
+            docker pull "$IMAGE"
+            # Stop + remove old container if exists
+            if docker ps -q --filter "name=${{ env.APP_NAME }}" | grep -q .; then
+              docker stop ${{ env.APP_NAME }} || true
+            fi
+            if docker ps -aq --filter "name=${{ env.APP_NAME }}" | grep -q .; then
+              docker rm ${{ env.APP_NAME }} || true
+            fi
+            # Run new container (idempotent)
+            docker run -d --name ${{ env.APP_NAME }} -p 80:300 --restart unless-stopped "$IMAGE"
+            echo "Deployment finished"
+
