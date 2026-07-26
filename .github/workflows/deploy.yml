@@ -8,7 +8,7 @@ on:
 env:
   IMAGE_NAME: sample-node-app
 
- jobs:
+jobs:
   test:
     name: Build and Test
     runs-on: ubuntu-latest
