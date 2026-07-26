@@ -8,13 +8,14 @@ on:
 env:
   IMAGE_NAME: sample-node-app
 
+defaults:
+      run:
+        working-directory: ./sample-node-app
+
 jobs:
   test:
     name: Build and Test
     runs-on: ubuntu-latest
-defaults:
-      run:
-        working-directory: ./sample-node-app
 
     steps:
       - name: Checkout Source
