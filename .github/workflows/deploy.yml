@@ -8,11 +8,8 @@ on:
 env:
   IMAGE_NAME: sample-node-app
 
-defaults:
-      run:
-        working-directory: ./sample-node-app
-
-jobs:
+ 
+ jobs:
   test:
     name: Build and Test
     runs-on: ubuntu-latest
