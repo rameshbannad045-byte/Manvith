@@ -14,10 +14,7 @@ jobs:
     runs-on: ubuntu-latest
 defaults:
       run:
-        working-directory: sample-node-app
-    defaults:
-      run:
-        working-directory: sample-node-app
+        working-directory: ./sample-node-app
 
     steps:
       - name: Checkout Source
