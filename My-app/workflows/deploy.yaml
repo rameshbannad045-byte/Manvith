@@ -3,8 +3,8 @@ on:
 push:
 branches: [ main ]
 env:
-DOCKERHUB_REPO: rameshbannad045/sample-node-app1
-CONTAINER_NAME: sample-node-app1
+DOCKERHUB_REPO: rameshbannad045/sample-node-ap
+CONTAINER_NAME: sample-node-app
 jobs:
 # ---------- 1. TEST STAGE ----------
 test:
@@ -13,7 +13,7 @@ permissions:
     contents: read
 defaults:
       run:
-        working-directory: .
+        working-directory: ./sample-node-app
 steps:
 - uses: actions/checkout@v4
 - uses: actions/setup-node@v4
